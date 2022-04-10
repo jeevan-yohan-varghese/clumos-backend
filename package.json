@@ -18,7 +18,10 @@
   "homepage": "https://github.com/jeevan-yohan-varghese/clumos-backend#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "firebase-admin": "^10.0.2",
+    "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1"
   },
   "devDependencies": {
