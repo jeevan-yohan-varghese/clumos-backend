@@ -113,7 +113,7 @@ connection.query('CREATE TABLE IF NOT EXISTS user_milestones(uid varchar(50),mli
 app.use(express.json());
 app.use(cors());
 
-//app.use('/api', routes);
+app.use('/api', routes);
 app.use('/auth', authRoutes);
 
 app.use((err, req, res, next) => {
