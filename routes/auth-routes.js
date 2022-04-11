@@ -5,7 +5,6 @@ const verifyApiKey = require('../middlewares/verify-apikey');
 
 const connection = require('../db');
 require('dotenv').config();
-const User = require('../models/user-model');
 
 
 console.log(process.env.FIREBASE_PROJECT_ID);
