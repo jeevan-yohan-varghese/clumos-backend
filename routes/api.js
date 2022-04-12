@@ -197,6 +197,95 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
 
 
 
+});
+
+router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.name || !req.body.clubId || !req.body.deadline || !req.body.isEvent) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+
+    if (req.body.isEvent != 'Y' && req.body.isEvent != 'N') {
+        return res.status(400).send({ error: true, msg: "Invalid value for isEvent" });
+    }
+    const userId = req.currentUser._uid;
+    connection.query("SELECT * from user_clubs where uid="
+        + "'" + userId + "' AND cid='"
+        + req.body.clubId + "';", (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+            if (row[0].role != 1) {
+                return res.status(403).send({ error: true, msg: "User not authorised to create project" });
+            } else {
+                const prjId = uuid.v4();
+                var imgUrl = "";
+                if (req.body.logoUrl) {
+                    imgUrl = req.body.logoUrl;
+                }
+                var createdDate = new Date().toISOString();
+                connection.query("INSERT INTO project VALUES("
+                    + "'" + prjId + "',"
+                    + "'" + req.body.name + "',"
+                    + "'" + imgUrl + "',"
+                    + "'" + req.body.deadline + "',"
+                    + "'" + req.body.isEvent + "',"
+                    + "'" + createdDate
+                    + "');", (err, row, fields) => {
+                        if (err) {
+                            return res.status(500).send({ error: true, msg: err })
+                        }
+
+                        connection.query("INSERT INTO user_projects VALUES ("
+                            + "'" + userId + "',"
+                            + "'" + prjId + "',"
+                            + "'" + createdDate + "',"
+                            + 1
+                            + ");", (err, row, fields) => {
+
+                                console.log("User Projects inserte query ");
+                                console.log(row);
+                                if (err) {
+                                    return res.status(500).send({ error: true, msg: err })
+                                }
+                                connection.query("INSERT INTO club_projects VALUES ("
+                                    + "'" + req.body.clubId + "',"
+                                    + "'" + prjId + "',"
+                                    + "'" + createdDate + "'"
+
+                                    + ");", (err, row, fields) => {
+                                        console.log("Club Projects inserte query ");
+                                        console.log(row);
+                                        if (err) {
+                                            return res.status(500).send({ error: true, msg: err })
+                                        } else {
+                                            return res.status(200).json({
+                                                success: true,
+                                                msg: "Project created",
+                                                prj_id: prjId
+                                            })
+                                        }
+
+
+
+                                    })
+
+
+                            })
+
+
+                    });
+            }
+
+
+        });
+
+
+
+
 
 
 
