@@ -13,7 +13,7 @@ router.post('/newClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
     }
 
-    
+
     const createdDate = new Date().toISOString();
     const clubID = uuid.v4();
     var logoUrl = "";
@@ -63,37 +63,29 @@ router.post('/newClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
 router.get('/getClubs', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 
-    if (!req.body.name) {
-        return res.status(400).json({ success: false, msg: "Club Name is required" });
+    const userId = req.currentUser._uid;
 
-    }
 
-    const createdDate = new Date().toISOString();
-    const clubID = uuid.v4();
-    var logoUrl = "";
-    if (req.body.logoUrl) {
-        logoUrl = req.body.logoUrl;
-    }
+    connection.query("SELECT * from user INNER JOIN user_clubs ON user.uid=user_clubs.uid INNER JOIN club ON club.cid=user_clubs.cid where user.uid='" + userId + "';", (err, row, fields) => {
+        if (err) {
+            return res.status(500).send({ error: true, msg: err })
+        }
 
-    connection.query("INSERT INTO club VALUES("
-        + "'" + clubID + "',"
-        + "'" + req.body.name + "',"
-        + "'" + logoUrl + "',"
-        + "'" + createdDate + "');", (err, row, fields) => {
-            if (err) {
-                return res.status(500).send({ error: true, msg: err })
-            }
-
-            return res.status(200).json({
-                success: true,
-                club: {
-                    club_id: clubID,
-                    club_name: req.body.name,
-                    logo_url: logoUrl,
-
-                }
-            })
-        });
+        var clubsList=[];
+       
+        for(var i=0;i<row.length;i++){
+            var club={};
+            club['club_id']=row[i].cid;
+            club['club_name']=row[i].club_name;
+            club['role']=row[i].role;
+            club['logo_url']=row[i].logo_url;
+            clubsList.push(club);
+        }
+        return res.status(200).json({
+            success: true,
+            clubs: clubsList
+        })
+    });
 
 
 

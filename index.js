@@ -18,7 +18,7 @@ connection.query('CREATE TABLE IF NOT EXISTS user(uid varchar(50) PRIMARY KEY,na
     })
 
 
-connection.query('CREATE TABLE IF NOT EXISTS club(cid varchar(50) PRIMARY KEY,name varchar(100) NOT NULL, logo_url varchar(800),created_on datetime NOT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS club(cid varchar(50) PRIMARY KEY,club_name varchar(100) NOT NULL, logo_url varchar(800),created_on datetime NOT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -26,7 +26,7 @@ connection.query('CREATE TABLE IF NOT EXISTS club(cid varchar(50) PRIMARY KEY,na
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS project(pid varchar(50) PRIMARY KEY,name varchar(100) NOT NULL, logo_url varchar(800),deadline datetime, is_event char(1) NOT NULL,created_on datetime NOT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS project(pid varchar(50) PRIMARY KEY,prj_name varchar(100) NOT NULL, logo_url varchar(800),deadline datetime, is_event char(1) NOT NULL,created_on datetime NOT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
