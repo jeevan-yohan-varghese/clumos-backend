@@ -110,6 +110,7 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
             return res.status(500).send({ error: true, msg: err })
         }
 
+        console.log(row);
         var msgList = [];
 
         for (var i = 0; i < row.length; i++) {
@@ -133,5 +134,76 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
 
 });
 
+
+router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.title || !req.body.content || !req.body.clubId) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+    const userId = req.currentUser._uid;
+    connection.query("SELECT * from user_clubs where uid="
+        + "'" + userId + "' AND cid='"
+        + req.body.clubId + "';", (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+            if (row[0].role != 1) {
+                return res.status(403).send({ error: true, msg: "User not authorised to make announcement" });
+            } else {
+                const msgId = uuid.v4();
+                var imgUrl = "";
+                if (req.body.imgUrl) {
+                    imgUrl = req.body.imgUrl;
+                }
+                var createdDate = new Date().toISOString();
+                connection.query("INSERT INTO messages VALUES("
+                    + "'" + msgId + "',"
+                    + "'" + req.body.title + "',"
+                    + "'" + req.body.content + "',"
+                    + "'" + imgUrl + "',"
+                    + "'" + createdDate + "',"
+                    + null
+
+                    + ");", (err, row, fields) => {
+                        if (err) {
+                            return res.status(500).send({ error: true, msg: err })
+                        }
+
+                        connection.query("INSERT INTO announcements VALUES ("
+                            + "'" + req.body.clubId + "',"
+                            + "'" + msgId + "'"
+                            + ");", (err, row, fields) => {
+
+                                if (err) {
+                                    return res.status(500).send({ error: true, msg: err })
+                                }
+                                return res.status(200).json({
+                                    success: true,
+                                    msg: "Announcement added",
+                                    msg_id: msgId
+                                })
+                            })
+
+
+                    });
+            }
+
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+});
 
 module.exports = router;
