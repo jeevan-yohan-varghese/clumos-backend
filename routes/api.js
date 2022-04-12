@@ -71,19 +71,58 @@ router.get('/getClubs', verifyApiKey, verifyUserAuth, (req, res, next) => {
             return res.status(500).send({ error: true, msg: err })
         }
 
-        var clubsList=[];
-       
-        for(var i=0;i<row.length;i++){
-            var club={};
-            club['club_id']=row[i].cid;
-            club['club_name']=row[i].club_name;
-            club['role']=row[i].role;
-            club['logo_url']=row[i].logo_url;
+        var clubsList = [];
+
+        for (var i = 0; i < row.length; i++) {
+            var club = {};
+            club['club_id'] = row[i].cid;
+            club['club_name'] = row[i].club_name;
+            club['role'] = row[i].role;
+            club['logo_url'] = row[i].logo_url;
             clubsList.push(club);
         }
         return res.status(200).json({
             success: true,
             clubs: clubsList
+        })
+    });
+
+
+
+
+
+
+});
+
+
+router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.clubId) {
+        return res.status(400).send({ error: true, msg: "Club id is required" });
+
+    }
+
+
+
+    connection.query("SELECT * from messages m INNER JOIN announcements a ON m.msid=a.msid where a.cid='" + req.body.clubId + "';", (err, row, fields) => {
+        if (err) {
+            return res.status(500).send({ error: true, msg: err })
+        }
+
+        var msgList = [];
+
+        for (var i = 0; i < row.length; i++) {
+            var msg = {};
+            msg['msg_Id'] = row[i].msid;
+            msg['title'] = row[i].title;
+            msg['content'] = row[i].content;
+            msg['img_url'] = row[i].img_url;
+            msgList.push(msg);
+        }
+        return res.status(200).json({
+            success: true,
+            announcements: msgList
         })
     });
 
