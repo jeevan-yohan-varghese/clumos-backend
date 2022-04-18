@@ -14,7 +14,7 @@ router.post('/newClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
     }
 
 
-    const createdDate = new Date().toISOString();
+    const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
     const clubID = uuid.v4();
     var logoUrl = "";
     if (req.body.logoUrl) {
@@ -29,7 +29,6 @@ router.post('/newClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
             if (err) {
                 return res.status(500).send({ error: true, msg: err })
             }
-
             connection.query("INSERT INTO user_clubs VALUES("
                 + "'" + req.currentUser._uid + "',"
                 + "'" + clubID + "',"
@@ -110,7 +109,7 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
             return res.status(500).send({ error: true, msg: err })
         }
 
-        console.log(row);
+        // console.log(row);
         var msgList = [];
 
         for (var i = 0; i < row.length; i++) {
@@ -286,40 +285,7 @@ router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 
 
-});
 
-
-router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
-
-
-    if (!req.body.clubId) {
-        return res.status(400).send({ error: true, msg: "Club id is required" });
-
-    }
-
-
-
-    connection.query("SELECT * from project p INNER JOIN user_projects u ON p.pid=u.pid INNER JOIN club_projects c ON p.pid=c.pid where u.uid='" + req.body.currentUser._uid+"' AND c.cid='" + req.body.clubId+"';", (err, row, fields) => {
-        if (err) {
-            return res.status(500).send({ error: true, msg: err })
-        }
-
-        console.log(row);
-        var msgList = [];
-
-        for (var i = 0; i < row.length; i++) {
-            var msg = {};
-            msg['msg_Id'] = row[i].msid;
-            msg['title'] = row[i].title;
-            msg['content'] = row[i].content;
-            msg['img_url'] = row[i].img_url;
-            msgList.push(msg);
-        }
-        return res.status(200).json({
-            success: true,
-            announcements: msgList
-        })
-    });
 
 
 
@@ -327,7 +293,5 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 
 });
-
-
 
 module.exports = router;

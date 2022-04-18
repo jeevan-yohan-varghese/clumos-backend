@@ -20,9 +20,7 @@ admin.initializeApp({
 router.post('/login', verifyApiKey, (req, res, next) => {
     admin.auth().verifyIdToken(req.body.authtoken)
         .then((decodedToken) => {
-            console.log(decodedToken.email);
-
-
+            // console.log(decodedToken.email, decodedToken.uid);
 
             connection.query("SELECT * from user where uid='" + decodedToken.uid + "';"
 
@@ -30,16 +28,14 @@ router.post('/login', verifyApiKey, (req, res, next) => {
                     if (err) {
                         res.status(500).send({ error: true, msg: err })
                     }
-                    if(!rows){
-                        res.status(404).send({error:true,msg:"User not found"});
+                    if (!rows) {
+                        res.status(404).send({ error: true, msg: "User not found" });
                     }
-                    console.log(rows);
-
-
+                    // console.log(rows[0]['email']);
 
                     //Existing user
 
-                    const token = jwt.sign({ _email: rows['email'], _name: rows['name'], _uid: rows['uid'] }, process.env.TOKEN_SECRET);
+                    const token = jwt.sign({ _email: `${rows[0]['email']}`, _name: `${rows[0]['name']}`, _uid: `${rows[0]['uid']}` }, process.env.TOKEN_SECRET);
                     return res.status(200).json({
                         success: true,
                         jwt: token,
@@ -54,11 +50,6 @@ router.post('/login', verifyApiKey, (req, res, next) => {
 
                 })
 
-
-
-
-
-
         }).catch((err) => {
             console.log(err);
             return res.status(500).send(err)
@@ -69,8 +60,6 @@ router.post('/login', verifyApiKey, (req, res, next) => {
 
 router.post('/signup', verifyApiKey, (req, res, next) => {
 
-
-
     if (!req.body.name) {
         return res.status(400).send({ error: true, msg: "Name is required" });
     }
@@ -78,12 +67,12 @@ router.post('/signup', verifyApiKey, (req, res, next) => {
         .then((decodedToken) => {
             console.log(decodedToken.email);
 
-            var profile_url=decodedToken.photo_url;
-            if(!profile_url){
-                profile_url='';
+            var profile_url = decodedToken.photo_url;
+            if (!profile_url) {
+                profile_url = '';
             }
 
-            var createdDate=new Date().toISOString();
+            var createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
             //New user
 
@@ -94,10 +83,13 @@ router.post('/signup', verifyApiKey, (req, res, next) => {
                 + "'" + profile_url + "',"
                 + "'" + createdDate + "');", (err, row, fields) => {
                     if (err) {
+                        console.log(err);
                         return res.status(500).send({ error: true, msg: err })
                     }
 
-                    const token = jwt.sign({ _email: decodedToken.email, _name: req.body.name, _uid: decodedToken.uid }, process.env.TOKEN_SECRET);
+                    console.log(decodedToken.email)
+
+                    const token = jwt.sign({ _email: `${decodedToken.email}`, _name: `${req.body.name}`, _uid: `${decodedToken.uid}` }, process.env.TOKEN_SECRET);
                     return res.status(200).json({
                         success: true,
                         authToken: token,
@@ -110,22 +102,11 @@ router.post('/signup', verifyApiKey, (req, res, next) => {
                     })
                 });
 
-
-
         }).catch((err) => {
             console.log(err);
             return res.status(500).send(err)
         });
 
-
-
-
-
-
 })
-
-
-
-
 
 module.exports = router
