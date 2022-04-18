@@ -118,6 +118,8 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
             msg['title'] = row[i].title;
             msg['content'] = row[i].content;
             msg['img_url'] = row[i].img_url;
+            msg['posted_date']=row[i].created_on;
+            msg['deleted_date']=row[i].deleted_on;
             msgList.push(msg);
         }
         return res.status(200).json({
