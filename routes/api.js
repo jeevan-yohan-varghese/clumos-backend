@@ -415,4 +415,45 @@ router.post('/joinClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 });
 
+router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.prjId) {
+        return res.status(400).send({ error: true, msg: "Project id is required" });
+
+    }
+
+
+
+    connection.query("SELECT * from messages m INNER JOIN project_messages p a ON m.msid=p.msid where p.pid='" + req.body.prjId + "';", (err, row, fields) => {
+        if (err) {
+            return res.status(500).send({ error: true, msg: err })
+        }
+
+        // console.log(row);
+        var msgList = [];
+
+        for (var i = 0; i < row.length; i++) {
+            var msg = {};
+            msg['msg_Id'] = row[i].msid;
+            msg['title'] = row[i].title;
+            msg['content'] = row[i].content;
+            msg['img_url'] = row[i].img_url;
+            msg['posted_date']=row[i].created_on;
+            msg['deleted_date']=row[i].deleted_on;
+            msgList.push(msg);
+        }
+        return res.status(200).json({
+            success: true,
+            announcements: msgList
+        })
+    });
+
+
+
+
+
+
+});
+
 module.exports = router;
