@@ -345,4 +345,72 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 });
 
+
+router.post('/joinClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.clubId) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+
+    connection.query("SELECT * from user_clubs where uid="
+        + "'" + req.currentUser._uid + "' AND cid="
+        + "'" + req.body.clubId + "';"
+        , (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+            if (row.length > 0) {
+                return res.status(400).send({error:true,msg:"User already in club"})
+
+            } else {
+                connection.query("INSERT INTO user_clubs VALUES("
+                    + "'" + req.currentUser._uid + "',"
+                    + "'" + req.body.clubId + "',"
+                    + 0 //Admin-1 Member-0
+                    + ");", (err, row, fields) => {
+                        if (err) {
+                            return res.status(500).send({ error: true, msg: err })
+                        }
+
+                        return res.status(200).json({
+                            success: true,
+                            club: {
+                                club_id: req.body.clubId,
+
+                                user_role: 0,
+
+
+                            }
+                        })
+                    })
+            }
+            return res.status(200).json({
+                success: true,
+                club: {
+                    club_id: req.body.clubId,
+
+                    user_role: 0,
+
+
+                }
+            })
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+});
+
 module.exports = router;
