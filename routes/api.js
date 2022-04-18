@@ -425,7 +425,7 @@ router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next
 
 
 
-    connection.query("SELECT * from messages m INNER JOIN project_messages p a ON m.msid=p.msid where p.pid='" + req.body.prjId + "';", (err, row, fields) => {
+    connection.query("SELECT * from messages m INNER JOIN project_messages p ON m.msid=p.msid where p.pid='" + req.body.prjId + "';", (err, row, fields) => {
         if (err) {
             return res.status(500).send({ error: true, msg: err })
         }
@@ -450,6 +450,72 @@ router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next
     });
 
 
+
+
+
+
+});
+
+
+router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.title || !req.body.content || !req.body.prjId) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+    const userId = req.currentUser._uid;
+    connection.query("SELECT * from user_projects where uid="
+        + "'" + userId + "' AND pid='"
+        + req.body.prjId + "';", (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+            if (row.length==0) {
+                return res.status(403).send({ error: true, msg: "User not authorised to post message" });
+            } else {
+                const msgId = uuid.v4();
+                var imgUrl = "";
+                if (req.body.imgUrl) {
+                    imgUrl = req.body.imgUrl;
+                }
+                var createdDate = new Date().toISOString();
+                connection.query("INSERT INTO messages VALUES("
+                    + "'" + msgId + "',"
+                    + "'" + req.body.title + "',"
+                    + "'" + req.body.content + "',"
+                    + "'" + imgUrl + "',"
+                    + "'" + createdDate + "',"
+                    + null
+
+                    + ");", (err, row, fields) => {
+                        if (err) {
+                            return res.status(500).send({ error: true, msg: err })
+                        }
+
+                        connection.query("INSERT INTO project_messages VALUES ("
+                            + "'" + req.body.prjId + "',"
+                            + "'" + msgId + "'"
+                            + ");", (err, row, fields) => {
+
+                                if (err) {
+                                    return res.status(500).send({ error: true, msg: err })
+                                }
+                                return res.status(200).json({
+                                    success: true,
+                                    msg: "Message added",
+                                    msg_id: msgId,
+                                    prj_id:req.body.prjId
+                                })
+                            })
+
+
+                    });
+            }
+
+
+        });
 
 
 
