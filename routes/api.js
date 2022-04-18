@@ -294,4 +294,55 @@ router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 });
 
+
+
+
+
+router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.clubId) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+
+
+    const userId = req.currentUser._uid;
+    connection.query("SELECT * from user_projects u INNER JOIN project p ON u.pid=p.pid INNER JOIN club_projects c on p.pid=c.pid where uid="
+        + "'" + userId + "' AND cid='"
+        + req.body.clubId + "';", (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+
+            var prjList = [];
+
+            for (var i = 0; i < row.length; i++) {
+                var prj = {};
+                prj['prj_id'] = row[i].pid;
+                prj['prj_name'] = row[i].name;
+
+                prjList.push(prj);
+            }
+            return res.status(200).json({
+                success: true,
+                projects: prjList
+            })
+
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+});
+
 module.exports = router;
