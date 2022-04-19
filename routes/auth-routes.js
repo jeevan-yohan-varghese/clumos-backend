@@ -2,6 +2,8 @@ const router = require('express').Router()
 const admin = require('firebase-admin')
 const jwt = require('jsonwebtoken')
 const verifyApiKey = require('../middlewares/verify-apikey');
+const formatLocalDate = require('../utils/local-date');
+
 
 const connection = require('../db');
 require('dotenv').config();
@@ -72,7 +74,7 @@ router.post('/signup', verifyApiKey, (req, res, next) => {
                 profile_url = '';
             }
 
-            var createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            const createdDate = formatLocalDate();
 
             //New user
 

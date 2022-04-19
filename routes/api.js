@@ -4,6 +4,7 @@ const verifyApiKey = require('../middlewares/verify-apikey');
 const verifyUserAuth = require('../middlewares/verify-user-auth');
 const connection = require('../db');
 const uuid = require('uuid');
+const formatLocalDate = require('../utils/local-date');
 
 router.post('/newClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
@@ -14,7 +15,7 @@ router.post('/newClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
     }
 
 
-    const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const createdDate = formatLocalDate();
     const clubID = uuid.v4();
     var logoUrl = "";
     if (req.body.logoUrl) {
@@ -118,8 +119,8 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
             msg['title'] = row[i].title;
             msg['content'] = row[i].content;
             msg['img_url'] = row[i].img_url;
-            msg['posted_date']=row[i].created_on;
-            msg['deleted_date']=row[i].deleted_on;
+            msg['posted_date'] = row[i].created_on;
+            msg['deleted_date'] = row[i].deleted_on;
             msgList.push(msg);
         }
         return res.status(200).json({
@@ -159,7 +160,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
                 if (req.body.imgUrl) {
                     imgUrl = req.body.imgUrl;
                 }
-                const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                const createdDate = formatLocalDate();
                 connection.query("INSERT INTO messages VALUES("
                     + "'" + msgId + "',"
                     + "'" + req.body.title + "',"
@@ -227,7 +228,7 @@ router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 if (req.body.logoUrl) {
                     imgUrl = req.body.logoUrl;
                 }
-                const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                const createdDate = formatLocalDate();
                 connection.query("INSERT INTO project VALUES("
                     + "'" + prjId + "',"
                     + "'" + req.body.name + "',"
@@ -365,7 +366,7 @@ router.post('/joinClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
             }
 
             if (row.length > 0) {
-                return res.status(400).send({error:true,msg:"User already in club"})
+                return res.status(400).send({ error: true, msg: "User already in club" })
 
             } else {
                 connection.query("INSERT INTO user_clubs VALUES("
@@ -439,8 +440,8 @@ router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next
             msg['title'] = row[i].title;
             msg['content'] = row[i].content;
             msg['img_url'] = row[i].img_url;
-            msg['posted_date']=row[i].created_on;
-            msg['deleted_date']=row[i].deleted_on;
+            msg['posted_date'] = row[i].created_on;
+            msg['deleted_date'] = row[i].deleted_on;
             msgList.push(msg);
         }
         return res.status(200).json({
@@ -472,7 +473,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                 return res.status(500).send({ error: true, msg: err })
             }
 
-            if (row.length==0) {
+            if (row.length == 0) {
                 return res.status(403).send({ error: true, msg: "User not authorised to post message" });
             } else {
                 const msgId = uuid.v4();
@@ -480,7 +481,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                 if (req.body.imgUrl) {
                     imgUrl = req.body.imgUrl;
                 }
-                const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                const createdDate = formatLocalDate();
                 connection.query("INSERT INTO messages VALUES("
                     + "'" + msgId + "',"
                     + "'" + req.body.title + "',"
@@ -506,7 +507,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                                     success: true,
                                     msg: "Message added",
                                     msg_id: msgId,
-                                    prj_id:req.body.prjId
+                                    prj_id: req.body.prjId
                                 })
                             })
 
