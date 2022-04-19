@@ -159,7 +159,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
                 if (req.body.imgUrl) {
                     imgUrl = req.body.imgUrl;
                 }
-                var createdDate = new Date().toISOString();
+                const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 connection.query("INSERT INTO messages VALUES("
                     + "'" + msgId + "',"
                     + "'" + req.body.title + "',"
@@ -227,7 +227,7 @@ router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 if (req.body.logoUrl) {
                     imgUrl = req.body.logoUrl;
                 }
-                var createdDate = new Date().toISOString();
+                const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 connection.query("INSERT INTO project VALUES("
                     + "'" + prjId + "',"
                     + "'" + req.body.name + "',"
@@ -480,7 +480,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                 if (req.body.imgUrl) {
                     imgUrl = req.body.imgUrl;
                 }
-                var createdDate = new Date().toISOString();
+                const createdDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 connection.query("INSERT INTO messages VALUES("
                     + "'" + msgId + "',"
                     + "'" + req.body.title + "',"
