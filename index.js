@@ -42,7 +42,7 @@ connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY 
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS messages(msid varchar(50) PRIMARY KEY,title varchar(500),content varchar(5000) NOT NULL,img_url varchar(800),created_on datetime NOT NULL, deleted_on datetime);'
+connection.query('CREATE TABLE IF NOT EXISTS messages(msid varchar(50) PRIMARY KEY,title varchar(500),content varchar(5000) NOT NULL,img_url varchar(800),created_on datetime NOT NULL, deleted_on datetime, posted_by varchar(50));'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -74,7 +74,7 @@ connection.query('CREATE TABLE IF NOT EXISTS club_projects(cid varchar(50),pid v
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS announcements(cid varchar(50),msid varchar(50), FOREIGN KEY (cid) references club(cid), FOREIGN KEY (msid) references messages(msid), PRIMARY KEY(cid,msid));'
+connection.query('CREATE TABLE IF NOT EXISTS announcements(cid varchar(50),msid varchar(50),posted_by varchar(50), FOREIGN KEY (cid) references club(cid), FOREIGN KEY (msid) references messages(msid), FOREIGN KEY (posted_by) references user(uid), PRIMARY KEY(cid,msid));'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -82,7 +82,7 @@ connection.query('CREATE TABLE IF NOT EXISTS announcements(cid varchar(50),msid 
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS project_messages(pid varchar(50),msid varchar(50), FOREIGN KEY (pid) references project(pid), FOREIGN KEY (msid) references messages(msid), PRIMARY KEY(pid,msid));'
+connection.query('CREATE TABLE IF NOT EXISTS project_messages(pid varchar(50),msid varchar(50),posted_by varchar(50), FOREIGN KEY (pid) references project(pid), FOREIGN KEY (msid) references messages(msid), FOREIGN KEY (posted_by) references user(uid),PRIMARY KEY(pid,msid));'
 
     , (err, rows, fields) => {
         if (err) throw err
