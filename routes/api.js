@@ -222,7 +222,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
 router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 
-    if (!req.body.name || !req.body.clubId || !req.body.deadline || !req.body.isEvent) {
+    if (!req.body.name || !req.body.clubId || !req.body.isEvent) {
         return res.status(400).send({ error: true, msg: "Some parameters are missing" });
 
     }
