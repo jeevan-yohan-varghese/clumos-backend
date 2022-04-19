@@ -115,10 +115,11 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
 
         for (var i = 0; i < row.length; i++) {
             var msg = {};
-            msg['msg_Id'] = row[i].msid;
+            msg['msg_id'] = row[i].msid;
             msg['title'] = row[i].title;
             msg['content'] = row[i].content;
             msg['img_url'] = row[i].img_url;
+            console.log(row[i]);
             msg['posted_date'] = row[i].created_on;
             msg['deleted_date'] = row[i].deleted_on;
 
@@ -160,6 +161,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
 
     }
     const userId = req.currentUser._uid;
+    console.log(req.currentUser);
     connection.query("SELECT * from user_clubs where uid="
         + "'" + userId + "' AND cid='"
         + req.body.clubId + "';", (err, row, fields) => {
@@ -182,8 +184,8 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
                     + "'" + req.body.content + "',"
                     + "'" + imgUrl + "',"
                     + "'" + createdDate + "',"
-                    + null
-
+                    + null + ","
+                    + "'" + req.currentUser._name + "'"
                     + ");", (err, row, fields) => {
                         if (err) {
                             return res.status(500).send({ error: true, msg: err })
