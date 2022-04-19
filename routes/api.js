@@ -104,12 +104,12 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
 
 
 
-    connection.query("SELECT * from messages m INNER JOIN announcements a ON m.msid=a.msid where a.cid='" + req.body.clubId + "';", (err, row, fields) => {
+    connection.query("SELECT * from messages m INNER JOIN announcements a ON m.msid=a.msid INNER JOIN user u ON a.posted_by=u.uid where a.cid='" + req.body.clubId + "';", (err, row, fields) => {
         if (err) {
             return res.status(500).send({ error: true, msg: err })
         }
 
-        // console.log(row);
+        //console.log(row);
         var msgList = [];
 
         for (var i = 0; i < row.length; i++) {
@@ -118,10 +118,25 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
             msg['title'] = row[i].title;
             msg['content'] = row[i].content;
             msg['img_url'] = row[i].img_url;
-            msg['posted_date']=row[i].created_on;
-            msg['deleted_date']=row[i].deleted_on;
+            msg['posted_date'] = row[i].created_on;
+            msg['deleted_date'] = row[i].deleted_on;
+
+
+
+
+            var user = {};
+            user['user_name'] = row[i].name;
+            user['user_email'] = row[i].email;
+            user['photo_url'] = row[i].photo_url;
+            user['uid'] = row[i].uid;
+            msg['posted_user'] = user;
+            //console.log(msg);
             msgList.push(msg);
+
+
+
         }
+
         return res.status(200).json({
             success: true,
             announcements: msgList
@@ -175,7 +190,8 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
 
                         connection.query("INSERT INTO announcements VALUES ("
                             + "'" + req.body.clubId + "',"
-                            + "'" + msgId + "'"
+                            + "'" + msgId + "',"
+                            + "'" + userId + "'"
                             + ");", (err, row, fields) => {
 
                                 if (err) {
@@ -365,7 +381,7 @@ router.post('/joinClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
             }
 
             if (row.length > 0) {
-                return res.status(400).send({error:true,msg:"User already in club"})
+                return res.status(400).send({ error: true, msg: "User already in club" })
 
             } else {
                 connection.query("INSERT INTO user_clubs VALUES("
@@ -425,10 +441,11 @@ router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next
 
 
 
-    connection.query("SELECT * from messages m INNER JOIN project_messages p ON m.msid=p.msid where p.pid='" + req.body.prjId + "';", (err, row, fields) => {
+    connection.query("SELECT * from messages m INNER JOIN project_messages p ON m.msid=p.msid INNER JOIN user u on p.posted_by=u.uid where p.pid='" + req.body.prjId + "';", (err, row, fields) => {
         if (err) {
             return res.status(500).send({ error: true, msg: err })
         }
+
 
         // console.log(row);
         var msgList = [];
@@ -439,8 +456,17 @@ router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next
             msg['title'] = row[i].title;
             msg['content'] = row[i].content;
             msg['img_url'] = row[i].img_url;
-            msg['posted_date']=row[i].created_on;
-            msg['deleted_date']=row[i].deleted_on;
+            msg['posted_date'] = row[i].created_on;
+            msg['deleted_date'] = row[i].deleted_on;
+
+            var user = {};
+            user['user_name'] = row[i].name;
+            user['user_email'] = row[i].email;
+            user['photo_url'] = row[i].photo_url;
+            user['uid'] = row[i].uid;
+            msg['posted_user'] = user;
+
+
             msgList.push(msg);
         }
         return res.status(200).json({
@@ -472,7 +498,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                 return res.status(500).send({ error: true, msg: err })
             }
 
-            if (row.length==0) {
+            if (row.length == 0) {
                 return res.status(403).send({ error: true, msg: "User not authorised to post message" });
             } else {
                 const msgId = uuid.v4();
@@ -496,7 +522,8 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
 
                         connection.query("INSERT INTO project_messages VALUES ("
                             + "'" + req.body.prjId + "',"
-                            + "'" + msgId + "'"
+                            + "'" + msgId + "',"
+                            + "'" + userId + "'"
                             + ");", (err, row, fields) => {
 
                                 if (err) {
@@ -506,7 +533,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                                     success: true,
                                     msg: "Message added",
                                     msg_id: msgId,
-                                    prj_id:req.body.prjId
+                                    prj_id: req.body.prjId
                                 })
                             })
 
