@@ -22,7 +22,7 @@ admin.initializeApp({
 router.post('/login', verifyApiKey, (req, res, next) => {
     admin.auth().verifyIdToken(req.body.authtoken)
         .then((decodedToken) => {
-            // console.log(decodedToken.email, decodedToken.uid);
+            console.log(decodedToken.email, decodedToken.uid);
 
             connection.query("SELECT * from user where uid='" + decodedToken.uid + "';"
 
@@ -30,14 +30,14 @@ router.post('/login', verifyApiKey, (req, res, next) => {
                     if (err) {
                         res.status(500).send({ error: true, msg: err })
                     }
-                    if (!rows) {
+                    if (!rows || rows.length<=0) {
                         res.status(404).send({ error: true, msg: "User not found" });
                     }
                     // console.log(rows[0]['email']);
 
                     //Existing user
 
-                    const token = jwt.sign({ _email: `${rows[0]['email']}`, _name: `${rows[0]['name']}`, _uid: `${rows[0]['uid']}` }, process.env.TOKEN_SECRET);
+                    const token = jwt.sign({ _email: `${rows[0]['user_email']}`, _name: `${rows[0]['user_name']}`, _uid: `${rows[0]['uid']}` }, process.env.TOKEN_SECRET);
                     return res.status(200).json({
                         success: true,
                         jwt: token,

@@ -605,4 +605,56 @@ router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 });
 
+
+router.post('/newMilestone', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.prjId || !req.body.deadline ||!req.body.content) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+
+    const mlsId=uuid.v4();
+    const createdDate=formatLocalDate();
+    connection.query("INSERT INTO MILESTONE VALUES("
+        + "'" + mlsId + "',"
+        + "'" + req.body.content + "',"
+        + "'" + req.body.deadline + "',"
+        + "'" + createdDate + "',"
+        +null
+        +");"
+        , (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+                connection.query("INSERT INTO project_milestones VALUES("
+                    + "'" + req.body.prjId + "',"
+                    + "'" + mlsId + "'"
+
+                    + ");", (err, row, fields) => {
+                        if (err) {
+                            return res.status(500).send({ error: true, msg: err })
+                        }
+
+                        return res.status(200).json({
+                            success: true,
+                            club: {
+                                prj_id: req.body.prjId,
+                                milestone_Id:mlsId,
+                                created_date: createdDate,
+
+
+                            }
+                        })
+                    })
+            
+            
+        })
+
+
+
+
+});
+
 module.exports = router;
