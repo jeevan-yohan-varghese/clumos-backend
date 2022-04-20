@@ -350,6 +350,7 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 var prj = {};
                 prj['prj_id'] = row[i].pid;
                 prj['prj_name'] = row[i].prj_name;
+                prj['user_role']=row[i].role;
 
                 prjList.push(prj);
             }
@@ -415,16 +416,7 @@ router.post('/joinClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
                         })
                     })
             }
-            return res.status(200).json({
-                success: true,
-                club: {
-                    club_id: req.body.clubId,
-
-                    user_role: 0,
-
-
-                }
-            })
+            
         })
 
 
@@ -554,6 +546,59 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
 
 
         });
+
+
+
+
+});
+
+
+router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.prjId) {
+        return res.status(400).send({ error: true, msg: "Some parameters are missing" });
+
+    }
+
+    connection.query("SELECT * from user_projects where uid="
+        + "'" + req.currentUser._uid + "' AND pid="
+        + "'" + req.body.prjId + "';"
+        , (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+
+            if (row.length > 0) {
+                return res.status(400).send({ error: true, msg: "User already in project" })
+
+            } else {
+                const joinedDate=formatLocalDate();
+                connection.query("INSERT INTO user_projects VALUES("
+                    + "'" + req.currentUser._uid + "',"
+                    + "'" + req.body.prjId + "',"
+                    +"'"+joinedDate+"',"
+                    + 0 //Admin-1 Member-0
+                    + ");", (err, row, fields) => {
+                        if (err) {
+                            return res.status(500).send({ error: true, msg: err })
+                        }
+
+                        return res.status(200).json({
+                            success: true,
+                            club: {
+                                prj_id: req.body.prjId,
+                                joined_date:joinedDate,
+                                user_role: 0,
+
+
+                            }
+                        })
+                    })
+            }
+            
+        })
 
 
 
