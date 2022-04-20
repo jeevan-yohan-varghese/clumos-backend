@@ -78,7 +78,7 @@ router.get('/getClubs', verifyApiKey, verifyUserAuth, (req, res, next) => {
             club['club_id'] = row[i].cid;
             club['club_name'] = row[i].club_name;
             club['role'] = row[i].role;
-            club['logo_url'] = row[i].logo_url;
+            club['logo_url'] = row[i].club_logo_url;
             clubsList.push(club);
         }
         return res.status(200).json({
@@ -114,22 +114,24 @@ router.post('/getAnnouncements', verifyApiKey, verifyUserAuth, (req, res, next) 
         var msgList = [];
 
         for (var i = 0; i < row.length; i++) {
+            console.log(row[i].created_on);
             var msg = {};
+            console.log("*******************************  ", row[i]);
             msg['msg_id'] = row[i].msid;
-            msg['title'] = row[i].title;
-            msg['content'] = row[i].content;
-            msg['img_url'] = row[i].img_url;
-            console.log(row[i]);
-            msg['posted_date'] = row[i].created_on;
-            msg['deleted_date'] = row[i].deleted_on;
+            msg['title'] = row[i].msg_title;
+            msg['content'] = row[i].msg_content;
+            msg['img_url'] = row[i].msg_img_url;
+            // console.log(row[i]);
+            msg['posted_date'] = row[i].msg_created_on;
+            msg['deleted_date'] = row[i].msg_deleted_on;
 
 
 
 
             var user = {};
-            user['user_name'] = row[i].name;
-            user['user_email'] = row[i].email;
-            user['photo_url'] = row[i].photo_url;
+            user['user_name'] = row[i].user_name;
+            user['user_email'] = row[i].user_email;
+            user['photo_url'] = row[i].user_photo_url;
             user['uid'] = row[i].uid;
             msg['posted_user'] = user;
             //console.log(msg);
@@ -161,7 +163,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
 
     }
     const userId = req.currentUser._uid;
-    console.log(req.currentUser);
+    //console.log(req.currentUser);
     connection.query("SELECT * from user_clubs where uid="
         + "'" + userId + "' AND cid='"
         + req.body.clubId + "';", (err, row, fields) => {
@@ -178,7 +180,10 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
                     imgUrl = req.body.imgUrl;
                 }
                 const createdDate = formatLocalDate();
-                connection.query("INSERT INTO messages VALUES("
+                //const createdDate=new Date().toISOString();//.slice(0, 19).replace('T', ' ');
+                //const createdDate = new Date();
+                console.log(createdDate);
+                let msgIns = connection.query("INSERT INTO messages VALUES("
                     + "'" + msgId + "',"
                     + "'" + req.body.title + "',"
                     + "'" + req.body.content + "',"
@@ -209,6 +214,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
 
 
                     });
+                console.log(msgIns.sql);
             }
 
 
@@ -238,6 +244,7 @@ router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 return res.status(500).send({ error: true, msg: err })
             }
 
+            console.log(req);
             if (row[0].role != 1) {
                 return res.status(403).send({ error: true, msg: "User not authorised to create project" });
             } else {
@@ -342,7 +349,7 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
             for (var i = 0; i < row.length; i++) {
                 var prj = {};
                 prj['prj_id'] = row[i].pid;
-                prj['prj_name'] = row[i].name;
+                prj['prj_name'] = row[i].prj_name;
 
                 prjList.push(prj);
             }
@@ -456,16 +463,16 @@ router.post('/getProjectMessages', verifyApiKey, verifyUserAuth, (req, res, next
         for (var i = 0; i < row.length; i++) {
             var msg = {};
             msg['msg_Id'] = row[i].msid;
-            msg['title'] = row[i].title;
-            msg['content'] = row[i].content;
-            msg['img_url'] = row[i].img_url;
-            msg['posted_date'] = row[i].created_on;
-            msg['deleted_date'] = row[i].deleted_on;
+            msg['title'] = row[i].msg_title;
+            msg['content'] = row[i].msg_content;
+            msg['img_url'] = row[i].msg_img_url;
+            msg['posted_date'] = row[i].msg_created_on;
+            msg['deleted_date'] = row[i].msg_deleted_on;
 
             var user = {};
-            user['user_name'] = row[i].name;
-            user['user_email'] = row[i].email;
-            user['photo_url'] = row[i].photo_url;
+            user['user_name'] = row[i].user_name;
+            user['user_email'] = row[i].user_email;
+            user['photo_url'] = row[i].user_photo_url;
             user['uid'] = row[i].uid;
             msg['posted_user'] = user;
 
@@ -517,6 +524,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                     + "'" + imgUrl + "',"
                     + "'" + createdDate + "',"
                     + null
+                    +",'"+userId+"'"
 
                     + ");", (err, row, fields) => {
                         if (err) {

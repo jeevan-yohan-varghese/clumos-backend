@@ -9,7 +9,7 @@ const connection = require('./db');
 
 
 
-connection.query('CREATE TABLE IF NOT EXISTS user(uid varchar(50) PRIMARY KEY,name varchar(100) NOT NULL, email varchar(50) NOT NULL, photo_url varchar(800),created_on timestamp NOT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS user(uid varchar(50) PRIMARY KEY,user_name varchar(100) NOT NULL, user_email varchar(50) NOT NULL, user_photo_url varchar(800),user_created_on timestamp NOT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -18,7 +18,7 @@ connection.query('CREATE TABLE IF NOT EXISTS user(uid varchar(50) PRIMARY KEY,na
     })
 
 
-connection.query('CREATE TABLE IF NOT EXISTS club(cid varchar(50) PRIMARY KEY,club_name varchar(100) NOT NULL, logo_url varchar(800),created_on timestamp NOT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS club(cid varchar(50) PRIMARY KEY,club_name varchar(100) NOT NULL, club_logo_url varchar(800),club_created_on timestamp NOT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -26,7 +26,7 @@ connection.query('CREATE TABLE IF NOT EXISTS club(cid varchar(50) PRIMARY KEY,cl
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS project(pid varchar(50) PRIMARY KEY,prj_name varchar(100) NOT NULL, logo_url varchar(800),deadline timestamp, is_event char(1) NOT NULL,created_on timestamp NOT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS project(pid varchar(50) PRIMARY KEY,prj_name varchar(100) NOT NULL, prj_logo_url varchar(800),prj_deadline timestamp, prj_is_event char(1) NOT NULL,prj_created_on timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -34,7 +34,7 @@ connection.query('CREATE TABLE IF NOT EXISTS project(pid varchar(50) PRIMARY KEY
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY KEY,content varchar(100) NOT NULL,deadline timestamp NOT NULL,created_on timestamp NOT NULL, finished_on timestamp NOT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY KEY,ml_content varchar(100) NOT NULL,ml_deadline timestamp NOT NULL,ml_created_on timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, ml_finished_on timestamp NULL DEFAULT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -42,7 +42,7 @@ connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY 
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS messages(msid varchar(50) PRIMARY KEY,title varchar(500),content varchar(5000) NOT NULL,img_url varchar(800),created_on timestamp NOT NULL, deleted_on timestamp NULL DEFAULT NULL, posted_by varchar(50));'
+connection.query('CREATE TABLE IF NOT EXISTS messages(msid varchar(50) PRIMARY KEY,msg_title varchar(500),msg_content varchar(5000) NOT NULL,msg_img_url varchar(800),msg_created_on timestamp NOT NULL, msg_deleted_on timestamp NULL DEFAULT NULL, msg_posted_by varchar(50));'
 
     , (err, rows, fields) => {
         if (err) throw err
@@ -66,7 +66,7 @@ connection.query('CREATE TABLE IF NOT EXISTS user_projects(uid varchar(50),pid v
 
         //console.log('Table created ', rows)
     })
-connection.query('CREATE TABLE IF NOT EXISTS club_projects(cid varchar(50),pid varchar(50),created_on timestamp NOT NULL, FOREIGN KEY (cid) references club(cid), FOREIGN KEY (pid) references project(pid), PRIMARY KEY(cid,pid));'
+connection.query('CREATE TABLE IF NOT EXISTS club_projects(cid varchar(50),pid varchar(50),clprj_created_on timestamp NOT NULL, FOREIGN KEY (cid) references club(cid), FOREIGN KEY (pid) references project(pid), PRIMARY KEY(cid,pid));'
 
     , (err, rows, fields) => {
         if (err) throw err
