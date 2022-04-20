@@ -171,6 +171,9 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
                 return res.status(500).send({ error: true, msg: err })
             }
 
+            if(!row || row.length<=0){
+                return res.status(403).send({ error: true, msg: "User not authorised to make announcement" });
+            }
             if (row[0].role != 1) {
                 return res.status(403).send({ error: true, msg: "User not authorised to make announcement" });
             } else {
