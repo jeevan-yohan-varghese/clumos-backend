@@ -350,7 +350,7 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 var prj = {};
                 prj['prj_id'] = row[i].pid;
                 prj['prj_name'] = row[i].prj_name;
-                prj['user_role']=row[i].role;
+                prj['user_role'] = row[i].role;
 
                 prjList.push(prj);
             }
@@ -416,7 +416,7 @@ router.post('/joinClub', verifyApiKey, verifyUserAuth, (req, res, next) => {
                         })
                     })
             }
-            
+
         })
 
 
@@ -516,7 +516,7 @@ router.post('/newProjectMessage', verifyApiKey, verifyUserAuth, (req, res, next)
                     + "'" + imgUrl + "',"
                     + "'" + createdDate + "',"
                     + null
-                    +",'"+userId+"'"
+                    + ",'" + userId + "'"
 
                     + ");", (err, row, fields) => {
                         if (err) {
@@ -574,11 +574,11 @@ router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 return res.status(400).send({ error: true, msg: "User already in project" })
 
             } else {
-                const joinedDate=formatLocalDate();
+                const joinedDate = formatLocalDate();
                 connection.query("INSERT INTO user_projects VALUES("
                     + "'" + req.currentUser._uid + "',"
                     + "'" + req.body.prjId + "',"
-                    +"'"+joinedDate+"',"
+                    + "'" + joinedDate + "',"
                     + 0 //Admin-1 Member-0
                     + ");", (err, row, fields) => {
                         if (err) {
@@ -589,7 +589,7 @@ router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                             success: true,
                             club: {
                                 prj_id: req.body.prjId,
-                                joined_date:joinedDate,
+                                joined_date: joinedDate,
                                 user_role: 0,
 
 
@@ -597,7 +597,7 @@ router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                         })
                     })
             }
-            
+
         })
 
 
@@ -609,48 +609,91 @@ router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
 router.post('/newMilestone', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 
-    if (!req.body.prjId || !req.body.deadline ||!req.body.content) {
+    if (!req.body.prjId || !req.body.deadline || !req.body.content) {
         return res.status(400).send({ error: true, msg: "Some parameters are missing" });
 
     }
 
-    const mlsId=uuid.v4();
-    const createdDate=formatLocalDate();
+    const mlsId = uuid.v4();
+    const createdDate = formatLocalDate();
     connection.query("INSERT INTO MILESTONE VALUES("
         + "'" + mlsId + "',"
         + "'" + req.body.content + "',"
         + "'" + req.body.deadline + "',"
         + "'" + createdDate + "',"
-        +null
-        +");"
+        + null
+        + ");"
         , (err, row, fields) => {
             if (err) {
                 return res.status(500).send({ error: true, msg: err })
             }
 
-                connection.query("INSERT INTO project_milestones VALUES("
-                    + "'" + req.body.prjId + "',"
-                    + "'" + mlsId + "'"
+            connection.query("INSERT INTO project_milestones VALUES("
+                + "'" + req.body.prjId + "',"
+                + "'" + mlsId + "'"
 
-                    + ");", (err, row, fields) => {
-                        if (err) {
-                            return res.status(500).send({ error: true, msg: err })
+                + ");", (err, row, fields) => {
+                    if (err) {
+                        return res.status(500).send({ error: true, msg: err })
+                    }
+
+                    return res.status(200).json({
+                        success: true,
+                        club: {
+                            prj_id: req.body.prjId,
+                            milestone_Id: mlsId,
+                            created_date: createdDate,
+
+
                         }
-
-                        return res.status(200).json({
-                            success: true,
-                            club: {
-                                prj_id: req.body.prjId,
-                                milestone_Id:mlsId,
-                                created_date: createdDate,
-
-
-                            }
-                        })
                     })
-            
-            
+                })
+
+
         })
+
+
+
+
+});
+
+
+router.post('/getProjectMilestones', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.prjId) {
+        return res.status(400).send({ error: true, msg: "Project id is required" });
+
+    }
+
+
+
+    connection.query("SELECT * from milestone m INNER JOIN project_milestones p ON m.mlid=p.mlid where p.pid='" + req.body.prjId + "';", (err, row, fields) => {
+        if (err) {
+            return res.status(500).send({ error: true, msg: err })
+        }
+
+
+        // console.log(row);
+        var mlList = [];
+
+        for (var i = 0; i < row.length; i++) {
+            var milestone = {};
+            milestone['milestone_id'] = row[i].mlid;
+            milestone['content'] = row[i].ml_content;
+            milestone['deadline'] = row[i].ml_deadline;
+            milestone['created_on'] = row[i].ml_created_on;
+            milestone['finished_on'] = row[i].ml_finished_on;
+
+            mlList.push(milestone);
+        }
+        return res.status(200).json({
+            success: true,
+            milestone: mlList
+        })
+    });
+
+
 
 
 
