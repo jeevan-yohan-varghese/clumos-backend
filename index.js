@@ -42,7 +42,7 @@ connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY 
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS messages(msid varchar(50) PRIMARY KEY,title varchar(500),content varchar(5000) NOT NULL,img_url varchar(800),created_on timestamp NOT NULL, deleted_on timestamp, posted_by varchar(50));'
+connection.query('CREATE TABLE IF NOT EXISTS messages(msid varchar(50) PRIMARY KEY,title varchar(500),content varchar(5000) NOT NULL,img_url varchar(800),created_on timestamp NOT NULL, deleted_on timestamp NULL DEFAULT NULL, posted_by varchar(50));'
 
     , (err, rows, fields) => {
         if (err) throw err
