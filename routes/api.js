@@ -616,17 +616,18 @@ router.post('/joinProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
 router.post('/newMilestone', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
 
-    if (!req.body.prjId || !req.body.deadline || !req.body.content) {
+    if (!req.body.prjId || !req.body.content) {
         return res.status(400).send({ error: true, msg: "Some parameters are missing" });
 
     }
 
     const mlsId = uuid.v4();
     const createdDate = formatLocalDate();
+    const deadline = req.body.deadline ? "'" + req.body.deadline + "'" : null;
     connection.query("INSERT INTO MILESTONE VALUES("
         + "'" + mlsId + "',"
         + "'" + req.body.content + "',"
-        + "'" + req.body.deadline + "',"
+        + deadline + ","
         + "'" + createdDate + "',"
         + null
         + ");"

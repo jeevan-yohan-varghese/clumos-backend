@@ -34,7 +34,7 @@ connection.query('CREATE TABLE IF NOT EXISTS project(pid varchar(50) PRIMARY KEY
         //console.log('Table created ', rows)
     })
 
-connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY KEY,ml_content varchar(100) NOT NULL,ml_deadline timestamp NOT NULL,ml_created_on timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, ml_finished_on timestamp NULL DEFAULT NULL);'
+connection.query('CREATE TABLE IF NOT EXISTS milestone(mlid varchar(50) PRIMARY KEY,ml_content varchar(100) NOT NULL,ml_deadline timestamp NULL,ml_created_on timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, ml_finished_on timestamp NULL DEFAULT NULL);'
 
     , (err, rows, fields) => {
         if (err) throw err
