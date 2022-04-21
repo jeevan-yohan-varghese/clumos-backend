@@ -28,10 +28,10 @@ router.post('/login', verifyApiKey, (req, res, next) => {
 
                 , (err, rows, fields) => {
                     if (err) {
-                        res.status(500).send({ error: true, msg: err })
+                        return res.status(500).send({ error: true, msg: err })
                     }
                     if (!rows || rows.length<=0) {
-                        res.status(404).send({ error: true, msg: "User not found" });
+                        return res.status(404).send({ error: true, msg: "User not found" });
                     }
                     // console.log(rows[0]['email']);
 
