@@ -68,23 +68,25 @@ router.get('/getClubs', verifyApiKey, verifyUserAuth, (req, res, next) => {
 
     connection.query("SELECT * from user INNER JOIN user_clubs ON user.uid=user_clubs.uid INNER JOIN club ON club.cid=user_clubs.cid where user.uid='" + userId + "';", (err, row, fields) => {
         if (err) {
-            return res.status(500).send({ error: true, msg: err })
+            return res.status(500).send({ error: true, msg: err });
+        } else {
+            var clubsList = [];
+
+            for (var i = 0; i < row.length; i++) {
+                var club = {};
+                club['club_id'] = row[i].cid;
+                club['club_name'] = row[i].club_name;
+                club['role'] = row[i].role;
+                club['logo_url'] = row[i].club_logo_url;
+                clubsList.push(club);
+            }
+            return res.status(200).json({
+                success: true,
+                clubs: clubsList
+            });
         }
 
-        var clubsList = [];
 
-        for (var i = 0; i < row.length; i++) {
-            var club = {};
-            club['club_id'] = row[i].cid;
-            club['club_name'] = row[i].club_name;
-            club['role'] = row[i].role;
-            club['logo_url'] = row[i].club_logo_url;
-            clubsList.push(club);
-        }
-        return res.status(200).json({
-            success: true,
-            clubs: clubsList
-        })
     });
 
 
@@ -355,8 +357,8 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 prj['prj_id'] = row[i].pid;
                 prj['prj_name'] = row[i].prj_name;
                 prj['user_role'] = row[i].role;
-                prj['is_event']=row[i].prj_is_event;
-                prj['logo_url']=row[i].prj_logo_url;
+                prj['is_event'] = row[i].prj_is_event;
+                prj['logo_url'] = row[i].prj_logo_url;
                 prjList.push(prj);
             }
             return res.status(200).json({
@@ -697,6 +699,54 @@ router.post('/getProjectMilestones', verifyApiKey, verifyUserAuth, (req, res, ne
             milestone: mlList
         })
     });
+
+
+
+
+
+
+});
+
+
+router.post('/getUserMilestones', verifyApiKey, verifyUserAuth, (req, res, next) => {
+
+
+    if (!req.body.clubId) {
+        return res.status(400).send({ error: true, msg: "Club id is required" });
+    }
+    const userId = req.currentUser._uid;
+    connection.query("SELECT * from user_projects u INNER JOIN club_projects c ON u.pid=c.pid INNER JOIN project p ON u.pid=p.pid INNER JOIN project_milestones m on p.pid=m.pid where uid="
+        + "'" + userId + "' AND cid='"
+        + req.body.clubId + "';", (err, row, fields) => {
+            if (err) {
+                return res.status(500).send({ error: true, msg: err })
+            }
+
+
+            var mlList = [];
+
+            for (var i = 0; i < row.length; i++) {
+                var milestone = {};
+                milestone['milestone_id'] = row[i].mlid;
+                milestone['content'] = row[i].ml_content;
+                milestone['deadline'] = row[i].ml_deadline;
+                milestone['created_on'] = row[i].ml_created_on;
+                milestone['finished_on'] = row[i].ml_finished_on;
+                milestone['project_name'] = row[i].prj_name;
+                mlList.push(milestone);
+            }
+            return res.status(200).json({
+                success: true,
+                milestones: mlList
+            })
+
+
+        });
+
+
+
+
+
 
 
 
