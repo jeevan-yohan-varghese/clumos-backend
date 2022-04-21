@@ -9,12 +9,7 @@ function auth(req, res, next) {
     return res.status(401).send('Access Denied');
   }
   try {
-    req.currentUser = jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-      if (err) {
-        return res.status(401).send('Access Denied');
-      }
-      return decoded;
-    });
+    req.currentUser = jwt.verify(token, process.env.TOKEN_SECRET);
   } catch {
     return res.status(401).send('Invalid Token');
   }
