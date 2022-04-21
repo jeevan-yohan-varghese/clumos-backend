@@ -716,7 +716,7 @@ router.post('/getUserMilestones', verifyApiKey, verifyUserAuth, (req, res, next)
         return res.status(400).send({ error: true, msg: "Club id is required" });
     }
     const userId = req.currentUser._uid;
-    connection.query("SELECT * from user_projects u INNER JOIN club_projects c ON u.pid=c.pid INNER JOIN project p ON u.pid=p.pid INNER JOIN project_milestones m on p.pid=m.pid where uid="
+    connection.query("SELECT * from user_projects u INNER JOIN club_projects c ON u.pid=c.pid INNER JOIN project p ON u.pid=p.pid INNER JOIN project_milestones m on p.pid=m.pid INNER JOIN milestone on milestone.mlid=m.mlid where uid="
         + "'" + userId + "' AND cid='"
         + req.body.clubId + "';", (err, row, fields) => {
             if (err) {
