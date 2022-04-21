@@ -42,8 +42,8 @@ router.post('/login', verifyApiKey, (req, res, next) => {
                         success: true,
                         jwt: token,
                         user: {
-                            name: rows[0]['name'],
-                            email: rows[0]['email'],
+                            name: rows[0]['user_name'],
+                            email: rows[0]['user_email'],
                             uid: rows[0]['uid'],
                             profile_url: rows[0]['photo_url']
                         }
