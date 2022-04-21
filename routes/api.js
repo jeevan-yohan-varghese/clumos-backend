@@ -738,7 +738,7 @@ router.post('/getUserMilestones', verifyApiKey, verifyUserAuth, (req, res, next)
             }
             return res.status(200).json({
                 success: true,
-                milestones: mlList
+                milestone: mlList
             })
 
 
