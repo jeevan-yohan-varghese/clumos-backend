@@ -354,7 +354,8 @@ router.post('/getProjects', verifyApiKey, verifyUserAuth, (req, res, next) => {
                 prj['prj_id'] = row[i].pid;
                 prj['prj_name'] = row[i].prj_name;
                 prj['user_role'] = row[i].role;
-
+                prj['is_event']=row[i].prj_is_event;
+                prj['logo_url']=row[i].prj_logo_url;
                 prjList.push(prj);
             }
             return res.status(200).json({
