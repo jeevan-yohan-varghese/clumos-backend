@@ -171,7 +171,7 @@ router.post('/newAnnouncement', verifyApiKey, verifyUserAuth, (req, res, next) =
                 return res.status(500).send({ error: true, msg: err })
             }
 
-            if(!row || row.length<=0){
+            if (!row || row.length <= 0) {
                 return res.status(403).send({ error: true, msg: "User not authorised to make announcement" });
             }
             if (row[0].role != 1) {
@@ -257,11 +257,12 @@ router.post('/newProject', verifyApiKey, verifyUserAuth, (req, res, next) => {
                     imgUrl = req.body.logoUrl;
                 }
                 const createdDate = formatLocalDate();
+                const deadline = req.body.deadline ? "'" + req.body.deadline + "'" : null;
                 connection.query("INSERT INTO project VALUES("
                     + "'" + prjId + "',"
                     + "'" + req.body.name + "',"
                     + "'" + imgUrl + "',"
-                    + "'" + req.body.deadline + "',"
+                    + deadline + ","
                     + "'" + req.body.isEvent + "',"
                     + "'" + createdDate
                     + "');", (err, row, fields) => {
